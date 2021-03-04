@@ -1,0 +1,136 @@
+---
+title: "EDA"
+author: "Matt Feder"
+date: "3/3/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-packages}
+library(tidyverse)
+```
+
+```{r load-data}
+deaths <- read_csv("drug_deaths.csv")
+```
+
+
+```{r examine}
+subset <- deaths %>%
+  select(Age, Sex, Race, DescriptionofInjury, COD, Heroin, Cocaine, Fentanyl, Fentanyl_Analogue, Oxycodone, Oxymorphone, Ethanol, Hydrocodone, Benzodiazepine, Methadone, Amphet, Tramad, Morphine_NotHeroin, Hydromorphone, Other, OpiateNOS, AnyOpioid, Location)
+
+```
+
+
+```{r }
+summary(subset)
+#only missing vals in age
+```
+
+```{r varPlots}
+subset %>%
+  ggplot(mapping = aes(x = Age)) + 
+  geom_histogram() + 
+  labs(Title = "Age")
+
+subset %>%
+  group_by(Sex) %>%
+  count()
+#7 missing for sex
+
+subset %>%
+  group_by(Race) %>%
+  count()
+#23 unkown, 11 other, compare to rates statewide?
+
+subset %>%
+  group_by(DescriptionofInjury) %>%
+  count()
+#321 similar groups
+
+subset %>%
+  group_by(COD) %>%
+  count()
+#3200 diff descriptions
+
+subset %>%
+  group_by(Location) %>%
+  count()
+
+subset %>%
+  group_by(Heroin) %>%
+  count() #half of deaths involved heroin
+
+subset %>%
+  group_by(Cocaine) %>%
+  count() #less than half cocaine
+
+subset %>%
+  group_by(Fentanyl) %>%
+  count() # half involving fentanyl
+
+subset %>%
+  group_by(Fentanyl_Analogue) %>%
+  count() # few involve fentanyl analogue
+
+subset %>%
+  group_by(Oxycodone) %>%
+  count() # some involve oxy
+
+subset %>%
+  mutate(opiate = case_when(
+    Heroin == 1 ~ 1, 
+    Fentanyl == 1 ~ 1, 
+    Fentanyl_Analogue == 1 ~ 1, 
+    Oxycodone == 1 ~ 1, 
+    Oxymorphone == 1 ~ 1, 
+    Hydrocodone == 1 ~ 1, 
+    Methadone == 1 ~ 1, 
+    Tramad == 1 ~ 1, 
+    Morphine_NotHeroin == 1 ~ 1, 
+    Hydromorphone == 1 ~ 1, 
+    OpiateNOS == 1 ~ 1, 
+    TRUE ~ 0 
+  ))  %>%
+  group_by(opiate) %>%
+  count()
+
+```
+
+```{r loc}
+subset %>%
+  group_by(Sex) %>%
+  count() %>%
+  ggplot(mapping = aes(x = Sex, y = n)) + 
+  geom_bar(stat = 'identity') + 
+  labs(title = "Distribution of Sex")
+
+subset %>%
+  group_by(Race) %>%
+  count() %>%
+  ggplot(mapping = aes(x = Race, y = n)) + 
+  geom_bar(stat = 'identity') + 
+  labs(title = "Distribution of Race")
+
+subset %>%
+  group_by(Sex) %>%
+  count() %>%
+  ggplot(mapping = aes(x = Sex, y = n)) + 
+  geom_bar(stat = 'identity') + 
+  labs(title = "Distribution of Sex")
+
+subset %>%
+  group_by(Location) %>%
+  count() %>%
+  ggplot(mapping = aes(x = Location, y = n)) + 
+  geom_bar(stat = 'identity') + 
+  labs(title = "Distribution of Location")
+
+
+```
+
+
+
